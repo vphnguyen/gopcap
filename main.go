@@ -259,7 +259,8 @@ func scanOpeningPortWithRange() {
 				withPorts = append(withPorts, port)
 			}
 		}
-		time.Sleep(time.Duration(config.Interval) * time.Second)
+		fmt.Println("Opening ports in range: ", withPorts)
+		time.Sleep(time.Duration(config.Interval+2) * time.Second)
 	}
 }
 
@@ -423,7 +424,6 @@ func controller() {
 		fmt.Println("Creating port-range Scanner")
 		go scanOpeningPortWithRange()
 	}
-	fmt.Println("Scanning on: ", withPorts)
 	go writeMetricToFile(config.OutputPath, reg, httpReqs)
 	catchingPacket()
 }

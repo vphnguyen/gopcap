@@ -150,7 +150,7 @@ func validateMonitorType(listType []string) error {
 func digestPacket(info *PacketSummaries) {
 	if info.isTCP() {
 		if info.isHttpRequest() && checkIfStringInList("HTTPRequest", config.MonitorType) {
-			if checkIfPortInList(toInt(info.tcp.DstPort.String()), withPorts) && checkIfStringInList(info.ip4.SrcIP.String(), withAddresses) {
+			if checkIfPortInList(toInt(info.tcp.DstPort.String()), withPorts) && checkIfStringInList(info.ip4.DstIP.String(), withAddresses) {
 				httpReqs.WithLabelValues(
 					info.ip4.SrcIP.String(),
 					info.ip4.DstIP.String(),
@@ -161,7 +161,7 @@ func digestPacket(info *PacketSummaries) {
 			}
 		}
 		if info.isSYN() && checkIfStringInList("SYNFlood", config.MonitorType) {
-			if checkIfPortInList(toInt(info.tcp.DstPort.String()), withPorts) && checkIfStringInList(info.ip4.SrcIP.String(), withAddresses) {
+			if checkIfPortInList(toInt(info.tcp.DstPort.String()), withPorts) && checkIfStringInList(info.ip4.DstIP.String(), withAddresses) {
 				httpReqs.WithLabelValues(
 					info.ip4.SrcIP.String(),
 					info.ip4.DstIP.String(),
@@ -173,7 +173,7 @@ func digestPacket(info *PacketSummaries) {
 		}
 	}
 	if info.isUDP() && checkIfStringInList("UDPFlood", config.MonitorType) {
-		if checkIfPortInList(toInt(info.tcp.DstPort.String()), withPorts) && checkIfStringInList(info.ip4.SrcIP.String(), withAddresses) {
+		if checkIfPortInList(toInt(info.tcp.DstPort.String()), withPorts) && checkIfStringInList(info.ip4.DstIP.String(), withAddresses) {
 			httpReqs.WithLabelValues(
 				info.ip4.SrcIP.String(),
 				info.ip4.DstIP.String(),

@@ -219,7 +219,7 @@ func convertPortRange(portRange *string, beginPortRange *int, endPortRange *int)
 }
 
 func checkIfPortInList(port int, list []int) bool {
-	for i := range list {
+	for _, i := range list {
 		if i == port {
 			fmt.Println(port, " with ", i, " in ", list)
 			return true

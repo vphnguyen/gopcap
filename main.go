@@ -97,7 +97,7 @@ func listInterfaces() error {
 }
 
 func scanOpeningPortOnLocal() ([]int, error) {
-	ports, er := am.Connections("all")
+	ports, er := am.Connections("inet")
 	if er != nil {
 		return nil, errors.New("Khong the quet cac port dang mo.")
 	}
@@ -250,16 +250,19 @@ func writeMetricToFile(path string, registry *prometheus.Registry, vector *prome
 
 func scanOpeningPortWithRange() {
 	for true {
-		openningPorts, er := scanOpeningPortOnLocal()
+		localPorts, er := scanOpeningPortOnLocal()
 		if er != nil {
 			HandleError(er)
 		}
-		withPorts = []int{}
-		for _, port := range openningPorts {
-			if beginPortRange <= port && port <= endPortRange {
-				withPorts = append(withPorts, port)
+		fmt.Println("bg ", beginPortRange, "  - end ", beginPortRange)
+
+		withPorts := make([]int, 0)
+		for _, localPort := range localPorts {
+			if beginPortRange <= localPort && localPort <= endPortRange {
+				withPorts = append(withPorts, localPort)
 			}
 		}
+		//============= CHECK THIS =================
 		fmt.Println("Opening ports in range: ", withPorts)
 		time.Sleep(time.Duration(config.Interval+2) * time.Second)
 	}

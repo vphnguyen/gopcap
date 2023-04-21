@@ -338,7 +338,7 @@ func validateEverythings() {
 	}
 	for _, port := range config.Ports {
 		p := toInt(port)
-		if !checkIfPortInList(p, withPorts) {
+		if !checkIfPortInList(int64(p), withPorts) {
 			withPorts = append(withPorts, p)
 		}
 	}

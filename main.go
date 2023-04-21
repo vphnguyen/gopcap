@@ -153,8 +153,8 @@ func digestPacket(info *PacketSummaries) {
 			if checkIfPortInList(toInt(info.tcp.DstPort.String()), withPorts) && checkIfStringInList(info.ip4.SrcIP.String(), withAddresses) {
 				httpReqs.WithLabelValues(
 					info.ip4.SrcIP.String(),
-					strconv.FormatInt(int64(info.tcp.DstPort), 10),
 					info.ip4.DstIP.String(),
+					strconv.FormatInt(int64(info.tcp.DstPort), 10),
 					info.ip4.Protocol.String(),
 					config.OnInterface,
 					"HTTPRequest").Inc()
@@ -164,8 +164,8 @@ func digestPacket(info *PacketSummaries) {
 			if checkIfPortInList(toInt(info.tcp.DstPort.String()), withPorts) && checkIfStringInList(info.ip4.SrcIP.String(), withAddresses) {
 				httpReqs.WithLabelValues(
 					info.ip4.SrcIP.String(),
-					strconv.FormatInt(int64(info.tcp.DstPort), 10),
 					info.ip4.DstIP.String(),
+					strconv.FormatInt(int64(info.tcp.DstPort), 10),
 					info.ip4.Protocol.String(),
 					config.OnInterface,
 					"SYNFlood").Inc()
@@ -176,8 +176,8 @@ func digestPacket(info *PacketSummaries) {
 		if checkIfPortInList(toInt(info.tcp.DstPort.String()), withPorts) && checkIfStringInList(info.ip4.SrcIP.String(), withAddresses) {
 			httpReqs.WithLabelValues(
 				info.ip4.SrcIP.String(),
-				strconv.FormatInt(int64(info.tcp.DstPort), 10),
 				info.ip4.DstIP.String(),
+				strconv.FormatInt(int64(info.tcp.DstPort), 10),
 				info.ip4.Protocol.String(),
 				config.OnInterface,
 				"UDPFlood").Inc()

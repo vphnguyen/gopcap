@@ -97,7 +97,7 @@ func listInterfaces() error {
 }
 
 func scanOpeningPortOnLocal() ([]int, error) {
-	ports, er := am.Connections("inet")
+	ports, er := am.Connections("all")
 	if er != nil {
 		return nil, errors.New("Khong the quet cac port dang mo.")
 	}

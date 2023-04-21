@@ -1,0 +1,21 @@
+[Service]
+
+
+
+
+
+
+socket --- core1 --- cpu0
+                |--- cpu1
+                
+
+#Managing Memory
+MemoryLimit=1G
+CPUWeight
+#CPUAffinity=1 2
+#LimitCPU=infinity
+LimitMEMLOCK=infinity
+MemoryMax=bytes
+MemoryHigh=bytes
+MemoryAccounting=¶
+LimitNPROC=64000

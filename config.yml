@@ -1,0 +1,15 @@
+monitor_type:
+- HTTPRequest
+- SYNFlood
+- UDPFlood 
+interface: "lo"
+interval: 3
+ip_addresses:
+- "127.0.0.1"
+- "192.168.1.170"
+path: /home/nguyenvp2/gopcap/metrics.prom
+ports: 
+- 80
+- 90
+- 100
+

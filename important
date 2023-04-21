@@ -1,0 +1,175 @@
+package main
+
+import (
+	"fmt"
+
+	"github.com/google/gopacket"
+	"github.com/google/gopacket/layers"
+	"github.com/google/gopacket/pcap"
+	"github.com/prometheus/client_golang/prometheus"
+)
+
+func main() {
+	// var
+	ch := make(chan gopacket.Packet)
+	wg := sync.WaitGroup{}
+
+	// create 10 wortker
+
+	for t := 0; t < 20; t++ {
+		wg.Add(2)
+		go team(ch, &wg)
+	}
+	counter := 0
+
+	if handle, err := pcap.OpenLive("lo", 1600, true, pcap.BlockForever); err != nil {
+		panic(err)
+	} else if err := handle.SetBPFFilter(""); err != nil { // optional
+		panic(err)
+	} else {
+		packetSource := gopacket.NewPacketSource(handle, handle.LinkType())
+		for packet := range packetSource.Packets() {
+			netLay := packet.ApplicationLayer()
+			fmt.Print(string(netLay.Payload()))
+			counter += 1
+			ch <- packet
+			fmt.Println(counter)
+		}
+		wg.Wait()
+	}
+}
+
+func team(ch chan gopacket.Packet, wg *sync.WaitGroup) {
+	for line := range ch {
+		worker(line)
+	}
+	wg.Done()
+}
+
+func worker(packet gopacket.Packet) {
+	var eth layers.Ethernet
+	var ip4 layers.IPv4
+	var tcp layers.UDP
+	//fmt.Printf("packet.Layers(): %s\n", packet.Layers())
+	parser := gopacket.NewDecodingLayerParser(layers.LayerTypeEthernet, &eth, &ip4, &tcp)
+	dlp := gopacket.NewDecodingLayerParser(layers.LayerTypeEthernet)
+	dlp.SetDecodingLayerContainer(gopacket.DecodingLayerSparse(nil))
+	decoded := []gopacket.LayerType{}
+
+	if err := parser.DecodeLayers(packet.Data(), &decoded); err != nil {
+		fmt.Fprintf(os.Stderr, "Could not decode layers: %v\n", err)
+		return
+	}
+	for _, layerType := range decoded {
+		switch layerType {
+		case layers.LayerTypeIPv4:
+			fmt.Println("    IP4 ", ip4.SrcIP, ip4.DstIP)
+		}
+	}
+}
+
+/*
+protocol port
+*/
+
+func main() {
+	httpReqs := prometheus.NewCounter(
+		prometheus.CounterOpts{
+			Name: "http_requests_total",
+			Help: "How many HTTP requests processed, partitioned by status code and HTTP method.",
+		},
+	)
+	reg := prometheus.NewRegistry()
+	reg.MustRegister(httpReqs)
+
+	// metricFam, _ := reg.Gather()
+
+	var eth layers.Ethernet
+	var ip4 layers.IPv4
+	var tcp layers.TCP
+	parser := gopacket.NewDecodingLayerParser(layers.LayerTypeEthernet, &eth, &ip4, &tcp)
+	decoded := []gopacket.LayerType{}
+	count := 0
+	if handle, err := pcap.OpenLive("lo", 1600, true, pcap.BlockForever); err != nil {
+		panic(err)
+	} else if err := handle.SetBPFFilter("tcp[tcpflags] == (tcp-push + tcp-ack) or udp and (dst port 80 or 90) and dst host 127.0.0.1 "); err != nil { // optional
+		panic(err)
+	} else {
+		packetSource := gopacket.NewPacketSource(handle, handle.LinkType())
+
+		for packet := range packetSource.Packets() {
+			fmt.Println("    packet ", packet.String())
+			count += 1
+
+			httpReqs.Inc()
+
+			parser.DecodeLayers(packet.Data(), &decoded)
+			fmt.Println("    IP4 ", ip4.SrcIP, ip4.DstIP, ip4.Flags, ip4.Protocol)
+			fmt.Println("    TCP ", tcp.SrcPort, tcp.DstPort, tcp.ACK, tcp.PSH)
+			for _, layer := range packet.Layers() {
+				fmt.Println("PACKET LAYER:", layer.LayerType())
+			}
+			if count == 5 {
+				prometheus.WriteToTextfile("final.prom", reg)
+				fmt.Println("  =cccccccccccccccccccccccccccccc=============================  ")
+
+			}
+			fmt.Println("  ===================================================  ")
+			fmt.Print(count)
+		}
+
+	}
+
+}
+
+// // func main() {
+// // 	var eth layers.Ethernet
+// // 	var ip4 layers.IPv4
+// // 	var ip6 layers.IPv6
+// // 	var tcp layers.TCP
+// // 	dlc := gopacket.DecodingLayerContainer(gopacket.DecodingLayerArray(nil))
+// // 	dlc = dlc.Put(&eth)
+// // 	dlc = dlc.Put(&ip4)
+// // 	dlc = dlc.Put(&ip6)
+// // 	dlc = dlc.Put(&tcp)
+// // 	// you may specify some meaningful DecodeFeedback
+// // 	decoder := dlc.LayersDecoder(layers.LayerTypeEthernet, gopacket.NilDecodeFeedback)
+// // 	decoded := make([]gopacket.LayerType, 0, 20)
+
+// // 	if handle, err := pcap.OpenLive("lo", 1600, true, pcap.BlockForever); err != nil {
+// // 		panic(err)
+// // 	} else if err := handle.SetBPFFilter("udp"); err != nil { // optional"(tcp or udp) and (dst host 127.0.0.1)
+// // 		panic(err)
+// // 	} else {
+// // 		counter := 0
+// // 		packetSource := gopacket.NewPacketSource(handle, handle.LinkType())
+// // 		for packet := range packetSource.Packets() {
+// // 			// fmt.Print(packet.NetworkLayer())
+// // 			counter += 1
+// // 			fmt.Println(counter)
+
+// // 			packet.String()
+// // 			lt, err := decoder(packet.Data(), &decoded)
+// // 			if err != nil {
+// // 				continue
+// // 			}
+// // 			if lt != gopacket.LayerTypeZero {
+// // 				continue
+// // 			}
+// // 			for _, layerType := range decoded {
+// // 				// examine decoded layertypes just as already shown above
+// // 				fmt.Println(layerType)
+// // 				if layerType == layers.LayerTypeIPv4 {
+// // 					fmt.Println("    IP4 ", ip4.SrcIP, ip4.Contents, ip4.NetworkFlow(), ip4.Flags, ip4.BaseLayer)
+
+// // 				}
+
+// // 			}
+
+// // 		}
+
+// // 	}
+
+// // }
+
+// /// tcp[tcpflags] == (tcp-push + tcp-ack) or udp and (dst port 80 or 90) and dst host 127.0.0.1

@@ -1,0 +1,16 @@
+monitor_type:
+- HTTPRequest
+- SYNFlood
+- UDPFlood
+interface: lo
+interval: 10
+ip_addresses:
+- 127.0.0.1
+- 192.168.1.170
+path: /path/to/file/filename.prom
+port_range: 'using this: 1-65000'
+ports:
+- 'or using this: '
+- "80"
+- "90"
+- "100"

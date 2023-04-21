@@ -150,7 +150,7 @@ func validateMonitorType(listType []string) error {
 func digestPacket(info *PacketSummaries) {
 	if info.isTCP() {
 		if info.isHttpRequest() && checkIfStringInList("HTTPRequest", config.MonitorType) {
-			fmt.Println( "check on: ", toInt(info.tcp.DstPort.String())
+			fmt.Println("check on: ", toInt(info.tcp.DstPort.String()))
 			if checkIfPortInList(toInt(info.tcp.DstPort.String()), withPorts) && checkIfStringInList(info.ip4.DstIP.String(), withAddresses) {
 				httpReqs.WithLabelValues(
 					info.ip4.SrcIP.String(),

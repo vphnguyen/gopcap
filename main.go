@@ -151,8 +151,7 @@ func digestPacket(info *PacketSummaries) {
 	if info.isTCP() {
 		dstPort := int64(info.tcp.DstPort)
 		if info.isHttpRequest() && checkIfStringInList("HTTPRequest", config.MonitorType) {
-			fmt.Println("check on: ", dstPort)
-			if checkIfPortInList(toInt(info.tcp.DstPort.String()), withPorts) && checkIfStringInList(info.ip4.DstIP.String(), withAddresses) {
+			if checkIfPortInList(dstPort, withPorts) && checkIfStringInList(info.ip4.DstIP.String(), withAddresses) {
 				httpReqs.WithLabelValues(
 					info.ip4.SrcIP.String(),
 					info.ip4.DstIP.String(),
@@ -163,7 +162,7 @@ func digestPacket(info *PacketSummaries) {
 			}
 		}
 		if info.isSYN() && checkIfStringInList("SYNFlood", config.MonitorType) {
-			if checkIfPortInList(toInt(info.tcp.DstPort.String()), withPorts) && checkIfStringInList(info.ip4.DstIP.String(), withAddresses) {
+			if checkIfPortInList(dstPort, withPorts) && checkIfStringInList(info.ip4.DstIP.String(), withAddresses) {
 				httpReqs.WithLabelValues(
 					info.ip4.SrcIP.String(),
 					info.ip4.DstIP.String(),
@@ -175,11 +174,12 @@ func digestPacket(info *PacketSummaries) {
 		}
 	}
 	if info.isUDP() && checkIfStringInList("UDPFlood", config.MonitorType) {
-		if checkIfPortInList(toInt(info.udp.DstPort.String()), withPorts) && checkIfStringInList(info.ip4.DstIP.String(), withAddresses) {
+		dstPort := int64(info.udp.DstPort)
+		if checkIfPortInList(dstPort, withPorts) && checkIfStringInList(info.ip4.DstIP.String(), withAddresses) {
 			httpReqs.WithLabelValues(
 				info.ip4.SrcIP.String(),
 				info.ip4.DstIP.String(),
-				strconv.FormatInt(int64(info.udp.DstPort), 10),
+				strconv.FormatInt(dstPort, 10),
 				info.ip4.Protocol.String(),
 				config.OnInterface,
 				"UDPFlood").Inc()
@@ -220,9 +220,9 @@ func convertPortRange(portRange *string, beginPortRange *int, endPortRange *int)
 	}
 }
 
-func checkIfPortInList(port int, list []int) bool {
+func checkIfPortInList(port int64, list []int) bool {
 	for _, i := range list {
-		if i == port {
+		if int64(i) == port {
 			fmt.Println(port, " with ", i, " in ", list)
 			return true
 		}

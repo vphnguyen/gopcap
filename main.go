@@ -223,7 +223,6 @@ func convertPortRange(portRange *string, beginPortRange *int, endPortRange *int)
 func checkIfPortInList(port int64, list []int) bool {
 	for _, i := range list {
 		if int64(i) == port {
-			fmt.Println(port, " with ", i, " in ", list)
 			return true
 		}
 	}
@@ -260,7 +259,6 @@ func scanOpeningPortWithRange() {
 				withPorts = append(withPorts, port)
 			}
 		}
-		fmt.Println(withPorts, ": are being scanned")
 		time.Sleep(time.Duration(config.Interval) * time.Second)
 	}
 }

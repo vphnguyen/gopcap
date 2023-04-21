@@ -107,6 +107,7 @@ func scanOpeningPortOnLocal() ([]int, error) {
 			openingPorts = append(openingPorts, int(element.Laddr.Port))
 		}
 	}
+	fmt.Println("Local list: ", openingPorts)
 	return openingPorts, nil
 }
 

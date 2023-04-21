@@ -96,7 +96,7 @@ func listInterfaces() error {
 	return nil
 }
 
-func scanOpeningPort() ([]int, error) {
+func scanOpeningPortOnLocal() ([]int, error) {
 	ports, er := am.Connections("inet")
 	if er != nil {
 		return nil, errors.New("Khong the quet cac port dang mo.")
@@ -245,9 +245,9 @@ func writeMetricToFile(path string, registry *prometheus.Registry, vector *prome
 	}
 }
 
-func scanOnlinePortWithRange() {
+func scanOpeningPortWithRange() {
 	for true {
-		openningPorts, er := scanOpeningPort()
+		openningPorts, er := scanOpeningPortOnLocal()
 		if er != nil {
 			HandleError(er)
 		}
@@ -419,8 +419,10 @@ func preparing() {
 func controller() {
 	preparing()
 	if len(config.PortRange) != 0 {
-		go scanOnlinePortWithRange()
+		fmt.Println("Creating port-range Scanner")
+		go scanOpeningPortWithRange()
 	}
+	fmt.Println("Scanning on: ", withPorts)
 	go writeMetricToFile(config.OutputPath, reg, httpReqs)
 	catchingPacket()
 }

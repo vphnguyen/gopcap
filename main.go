@@ -209,8 +209,8 @@ func convertPortRange(portRange *string, beginPortRange *int, endPortRange *int)
 		first := toInt(list[0])
 		last := toInt(list[1])
 		if first < last {
-			beginPortRange = &first
-			endPortRange = &last
+			*beginPortRange = first
+			*endPortRange = last
 			return nil
 		}
 		beginPortRange = &last
@@ -254,8 +254,6 @@ func scanOpeningPortWithRange() {
 		if er != nil {
 			HandleError(er)
 		}
-		fmt.Println("bg ", beginPortRange, "  - end ", beginPortRange)
-
 		withPorts := make([]int, 0)
 		for _, localPort := range localPorts {
 			if beginPortRange <= localPort && localPort <= endPortRange {
@@ -420,12 +418,12 @@ func preparing() {
 	}
 	fmt.Println(config)
 	validateEverythings()
+
 }
 
 func controller() {
 	preparing()
 	if len(config.PortRange) != 0 {
-		fmt.Println("Creating port-range Scanner")
 		go scanOpeningPortWithRange()
 	}
 	go writeMetricToFile(config.OutputPath, reg, httpReqs)

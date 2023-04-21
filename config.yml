@@ -8,6 +8,7 @@ ip_addresses:
 - "127.0.0.1"
 - "192.168.1.170"
 path: /home/nguyenvp2/gopcap/metrics.prom
+port_range: "80-10000"
 ports: 
 - 80
 - 90

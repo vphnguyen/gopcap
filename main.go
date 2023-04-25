@@ -70,7 +70,7 @@ var reg = prometheus.NewRegistry()
 var allAddress = false
 var httpReqs = prometheus.NewGaugeVec(
 	prometheus.GaugeOpts{
-		Name: "HTTP_source_control_counter",
+		Name: "HTTP_source_control",
 		Help: "Count requests from an ip address to ports on server",
 	},
 	[]string{"sourceIP", "destIP", "destPort", "protocol", "interface", "monitorType"},

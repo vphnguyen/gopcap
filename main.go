@@ -68,8 +68,8 @@ var endPortRange int
 var config Config
 var reg = prometheus.NewRegistry()
 var allAddress = false
-var httpReqs = prometheus.NewGaugeVec(
-	prometheus.GaugeOpts{
+var httpReqs = prometheus.NewCounterVec(
+	prometheus.CounterOpts{
 		Name: "HTTP_source_control",
 		Help: "Count requests from an ip address to ports on server",
 	},
@@ -238,7 +238,7 @@ func checkIfStringInList(s string, l []string) bool {
 	return false
 }
 
-func writeMetricToFile(path string, registry *prometheus.Registry, vector *prometheus.GaugeVec) {
+func writeMetricToFile(path string, registry *prometheus.Registry, vector *prometheus.CounterVec) {
 	for true {
 		if er := prometheus.WriteToTextfile(path, registry); er != nil {
 			HandleError(errors.New("Khong the ghi vao file: " + path))

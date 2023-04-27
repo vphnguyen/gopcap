@@ -243,7 +243,6 @@ func writeMetricToFile(path string, registry *prometheus.Registry, vector *prome
 		if er := prometheus.WriteToTextfile(path, registry); er != nil {
 			HandleError(errors.New("Khong the ghi vao file: " + path))
 		}
-		httpReqs.Reset()
 		time.Sleep(time.Duration(config.Interval) * time.Second)
 	}
 }
